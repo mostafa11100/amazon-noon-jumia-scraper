@@ -1,8 +1,8 @@
-name: Noon Scraper - Account 4 (Groups 33-42)
+name: Noon Scraper - Account 1 (Groups 0-10)
 
 on:
   schedule:
-    - cron: '15 2 * * *'   # 4:15 AM Egypt time
+    - cron: '0 2 * * *'   # 4:00 AM Egypt time
   workflow_dispatch:
     inputs:
       reason:
@@ -19,9 +19,10 @@ jobs:
     name: Scrape Group ${{ matrix.group_index }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    continue-on-error: true
     strategy:
       matrix:
-        group_index: [33,34,35,36,37,38,39,40,41,42]
+        group_index: [0,1,2,3,4,5,6,7,8,9,10]
       fail-fast: false
       max-parallel: 20
 
@@ -49,15 +50,23 @@ jobs:
           echo "DISPLAY=:99" >> $GITHUB_ENV
 
       - name: Run spider (Group ${{ matrix.group_index }})
+        id: scrape
         env:
           DISPLAY: :99
         run: python noon_spider.py --group_index ${{ matrix.group_index }} --limit ${{ github.event.inputs.limit || '99999' }}
 
+      - name: Log blocked group
+        if: failure()
+        run: echo "Group ${{ matrix.group_index }} | blocked/failed" >> blocked.log
+
       - name: Upload results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: noon-products-${{ matrix.group_index }}
-          path: products_${{ matrix.group_index }}.json
+          path: |
+            products_${{ matrix.group_index }}.json
+            blocked.log
 
   export:
     name: Merge & Export CSV
@@ -115,14 +124,14 @@ jobs:
           MASTER_TOKEN: ${{ secrets.MASTER_REPO_TOKEN }}
         run: |
           git clone https://${MASTER_TOKEN}@github.com/mostafa11100/scraped-products-master.git master_repo
-          mkdir -p master_repo/data/account4
-          cp noon_products.csv master_repo/data/account4/ 2>/dev/null || true
+          mkdir -p master_repo/data/account1
+          cp noon_products.csv master_repo/data/account1/ 2>/dev/null || true
           cd master_repo
           git config user.email "scraper-bot@github.com"
           git config user.name "Scraper Bot"
           git add data/
           if ! git diff --staged --quiet; then
-            git commit -m "Update noon from account4 - $(date -u +%Y-%m-%d)"
+            git commit -m "Update noon from account1 - $(date -u +%Y-%m-%d)"
             for i in 1 2 3; do
               git pull --rebase origin main && git push && break || sleep $((RANDOM % 20 + 10))
             done
