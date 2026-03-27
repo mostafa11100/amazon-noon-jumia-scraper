@@ -34,10 +34,10 @@ jobs:
           MATRIX=$(python - <<'EOF'
           import json, sys
           cats = json.load(open("categories.json", encoding="utf-8"))
-          subset = cats[22:]
+          subset = cats[17:]
           matrix = {
               "include": [
-                  {"name": c["name"], "url": c["url"], "idx": i + 22}
+                  {"name": c["name"], "url": c["url"], "idx": i + 17}
                   for i, c in enumerate(subset)
               ]
           }
