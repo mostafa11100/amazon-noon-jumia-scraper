@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '15 3 * * *'   # 5:15 AM Egypt time
   workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max products per category'
+        required: false
+        default: '5000'
 
 jobs:
   discover:
