@@ -39,6 +39,7 @@ jobs:
               "include": [
                   {"name": c["name"], "url": c["url"], "idx": i + 17}
                   for i, c in enumerate(subset)
+                  if (i + 17) != 19  # idx 19 (Office Supplies) handled by self-hosted runner
               ]
           }
           print(json.dumps(matrix))
