@@ -1,4 +1,4 @@
-name: Jumia Scraper - Account 1 (Categories 0-7)
+name: Jumia Scraper - Account 4 (Categories 17+)
 
 on:
   schedule:
@@ -34,7 +34,7 @@ jobs:
           MATRIX=$(python - <<'EOF'
           import json, sys
           cats = json.load(open("categories.json", encoding="utf-8"))
-          subset = cats[0:6]
+          subset = cats[17:99]
           matrix = {
               "include": [
                   {"name": c["name"], "url": c["url"], "idx": i}
@@ -141,14 +141,14 @@ jobs:
           MASTER_TOKEN: ${{ secrets.MASTER_REPO_TOKEN }}
         run: |
           git clone https://${MASTER_TOKEN}@github.com/mostafa11100/scraped-products-master.git master_repo
-          mkdir -p master_repo/data/account1
-          cp jumia_products.csv master_repo/data/account1/ 2>/dev/null || true
+          mkdir -p master_repo/data/account4
+          cp jumia_products.csv master_repo/data/account4/ 2>/dev/null || true
           cd master_repo
           git config user.email "scraper-bot@github.com"
           git config user.name "Scraper Bot"
           git add data/
           if ! git diff --staged --quiet; then
-            git commit -m "Update jumia from account1 - $(date -u +%Y-%m-%d)"
+            git commit -m "Update jumia from account4 - $(date -u +%Y-%m-%d)"
             for i in 1 2 3; do
               git pull --rebase origin main && git push && break || sleep $((RANDOM % 20 + 10))
             done
