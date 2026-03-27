@@ -23,7 +23,7 @@ jobs:
       matrix:
         group_index: [33,34,35,36,37,38,39,40,41,42]
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
         run: playwright install chromium --with-deps
 
       - name: Stagger start
-        run: sleep $((RANDOM % 60 + 30))
+        run: sleep $((RANDOM % 20 + 5))
 
       - name: Start virtual display
         run: |
