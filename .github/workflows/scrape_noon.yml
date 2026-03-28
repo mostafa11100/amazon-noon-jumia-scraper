@@ -1,8 +1,8 @@
-name: Noon Scraper - Account 4 (Groups 33-42)
+name: Noon Scraper - Account 4 (Groups 21-27)
 
 on:
   schedule:
-    - cron: '0 2 * * *'   # 4:00 AM Egypt time
+    - cron: '9 2 * * *'   # 4:00 AM Egypt time
   workflow_dispatch:
     inputs:
       reason:
@@ -22,7 +22,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        group_index: [33,34,35,36,37,38,39,40,41,42]
+        group_index: [21,22,23,24,25,26,27]
       fail-fast: false
       max-parallel: 20
 
@@ -102,18 +102,19 @@ jobs:
           print(f"\nTotal: {len(merged)} products")
 
           columns = [
-              "platform", "sku", "title", "brand", "category",
+              "platform", "product_id", "title", "brand", "category",
               "current_price", "original_price", "discount",
               "rating", "reviews_count", "availability",
-              "seller", "noon_express",
-              "main_image", "all_images", "product_url", "scraped_at",
+              "seller", "express_delivery", "platform_badge", "sponsored",
+              "main_image", "all_images", "description", "weight", "dimensions",
+              "model_number", "country_of_origin", "warranty", "tech_specs", "variations",
+              "ships_from", "delivery_date", "product_url", "scraped_at",
           ]
 
           with open("noon_products.csv", "w", encoding="utf-8-sig", newline="") as f:
               writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
               writer.writeheader()
               for item in merged:
-                  item["all_images"] = " | ".join(item.get("all_images", []))
                   writer.writerow(item)
 
           print("CSV saved: noon_products.csv")
@@ -124,14 +125,14 @@ jobs:
           MASTER_TOKEN: ${{ secrets.MASTER_REPO_TOKEN }}
         run: |
           git clone https://${MASTER_TOKEN}@github.com/khaledali45947-dev/scraped-products-master.git master_repo
-          mkdir -p master_repo/data/account1
-          cp noon_products.csv master_repo/data/account1/ 2>/dev/null || true
+          mkdir -p master_repo/data/account4
+          cp noon_products.csv master_repo/data/account4/ 2>/dev/null || true
           cd master_repo
           git config user.email "scraper-bot@github.com"
           git config user.name "Scraper Bot"
           git add data/
           if ! git diff --staged --quiet; then
-            git commit -m "Update noon from account1 - $(date -u +%Y-%m-%d)"
+            git commit -m "Update noon from account4 - $(date -u +%Y-%m-%d)"
             for i in 1 2 3; do
               git pull --rebase origin main && git push && break || sleep $((RANDOM % 20 + 10))
             done
