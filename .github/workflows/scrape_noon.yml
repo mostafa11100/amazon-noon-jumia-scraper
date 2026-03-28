@@ -102,19 +102,18 @@ jobs:
           print(f"\nTotal: {len(merged)} products")
 
           columns = [
-              "platform", "product_id", "title", "brand", "category",
+              "platform", "sku", "title", "brand", "category",
               "current_price", "original_price", "discount",
               "rating", "reviews_count", "availability",
-              "seller", "express_delivery", "platform_badge", "sponsored",
-              "main_image", "all_images", "description", "weight", "dimensions",
-              "model_number", "country_of_origin", "warranty", "tech_specs", "variations",
-              "ships_from", "delivery_date", "product_url", "scraped_at",
+              "seller", "noon_express",
+              "main_image", "all_images", "product_url", "scraped_at",
           ]
 
           with open("noon_products.csv", "w", encoding="utf-8-sig", newline="") as f:
               writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
               writer.writeheader()
               for item in merged:
+                  item["all_images"] = " | ".join(item.get("all_images", []))
                   writer.writerow(item)
 
           print("CSV saved: noon_products.csv")

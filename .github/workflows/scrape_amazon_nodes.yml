@@ -19,18 +19,18 @@ jobs:
       max-parallel: 20
       matrix:
         include:
-          - { node_id: "18021875031",  node_name: "Baby & Child Care" }
-          - { node_id: "18017807031",  node_name: "Cat7807031" }
+          - { node_id: "21832982031",  node_name: "Cat2982031" }
+          - { node_id: "26082322031",  node_name: "Cat2322031" }
+          - { node_id: "27972173031",  node_name: "Cat2173031" }
           - { node_id: "18022560031",  node_name: "Video Games" }
-          - { node_id: "21845179031",  node_name: "Cat5179031" }
-          - { node_id: "21826032031",  node_name: "Cat6032031" }
-          - { node_id: "21832873031",  node_name: "Cat2873031" }
-          - { node_id: "21868933031",  node_name: "Cat8933031" }
-          - { node_id: "96581804031",  node_name: "Cat1804031" }
-          - { node_id: "21833200031",  node_name: "Cat3200031" }
-          - { node_id: "212401097031",  node_name: "Cat1097031" }
-          - { node_id: "26082316031",  node_name: "Cat2316031" }
-          - { node_id: "21857904031",  node_name: "Cat7904031" }
+          - { node_id: "21833429031",  node_name: "Cat3429031" }
+          - { node_id: "49987991031",  node_name: "Cat7991031" }
+          - { node_id: "21832870031",  node_name: "Cat2870031" }
+          - { node_id: "26082332031",  node_name: "Cat2332031" }
+          - { node_id: "21845410031",  node_name: "Cat5410031" }
+          - { node_id: "18022503031",  node_name: "Toys & Games" }
+          - { node_id: "21857879031",  node_name: "Cat7879031" }
+          - { node_id: "21857974031",  node_name: "Cat7974031" }
           - { node_id: "21857914031",  node_name: "Cat7914031" }
 
     steps:
