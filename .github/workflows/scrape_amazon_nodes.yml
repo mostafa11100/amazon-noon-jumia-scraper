@@ -1,4 +1,4 @@
-name: Amazon Node Scraper - Account 4 (22 nodes)
+name: Amazon Node Scraper - Account 4 (20 nodes)
 
 on:
   workflow_dispatch:
@@ -18,28 +18,28 @@ jobs:
       max-parallel: 20
       matrix:
         include:
-          - { node_id: "21857922031",   node_name: "Cat7922031" }
-          - { node_id: "21845403031",   node_name: "Cat5403031" }
-          - { node_id: "18018045031",   node_name: "Cat8045031" }
-          - { node_id: "18022446031",   node_name: "Cat2446031" }
-          - { node_id: "21775780031",   node_name: "Cat5780031" }
-          - { node_id: "21857878031",   node_name: "Cat7878031" }
-          - { node_id: "21857904031",   node_name: "Cat7904031" }
-          - { node_id: "21845414031",   node_name: "Cat5414031" }
-          - { node_id: "21868933031",   node_name: "Cat8933031" }
-          - { node_id: "21832982031",   node_name: "Cat2982031" }
-          - { node_id: "26082322031",   node_name: "Cat2322031" }
-          - { node_id: "27972173031",   node_name: "Cat2173031" }
-          - { node_id: "18022560031",   node_name: "Video Games" }
-          - { node_id: "21833429031",   node_name: "Cat3429031" }
-          - { node_id: "49987991031",   node_name: "Cat7991031" }
-          - { node_id: "21832870031",   node_name: "Cat2870031" }
-          - { node_id: "21845202031",   node_name: "Cat5202031" }
-          - { node_id: "21845418031",   node_name: "Cat5418031" }
-          - { node_id: "21868934031",   node_name: "Cat8934031" }
-          - { node_id: "21832886031",   node_name: "Cat2886031" }
-          - { node_id: "21832883031",   node_name: "Mobile Phones" }
-          - { node_id: "21857955031",   node_name: "Cat7955031" }
+          - { node_id: "18021990031",  node_name: "Tools & Home Improvement" }
+          - { node_id: "21805227031",  node_name: "Cat5227031" }
+          - { node_id: "18018045031",  node_name: "Cat8045031" }
+          - { node_id: "21845410031",  node_name: "Cat5410031" }
+          - { node_id: "21845335031",  node_name: "Cat5335031" }
+          - { node_id: "21826026031",  node_name: "Perfumes" }
+          - { node_id: "21845419031",  node_name: "Cat5419031" }
+          - { node_id: "21868934031",  node_name: "Cat8934031" }
+          - { node_id: "21832870031",  node_name: "Cat2870031" }
+          - { node_id: "21845331031",  node_name: "Cat5331031" }
+          - { node_id: "27360698031",  node_name: "Cat0698031" }
+          - { node_id: "21858001031",  node_name: "Cat8001031" }
+          - { node_id: "21820640031",  node_name: "Cat0640031" }
+          - { node_id: "21857922031",  node_name: "Cat7922031" }
+          - { node_id: "212533997031",  node_name: "Cat3997031" }
+          - { node_id: "21833210031",  node_name: "Cat3210031" }
+          - { node_id: "49987963031",  node_name: "Cat7963031" }
+          - { node_id: "21833213031",  node_name: "Cat3213031" }
+          - { node_id: "21845202031",  node_name: "Cat5202031" }
+          - { node_id: "21833429031",  node_name: "Cat3429031" }
+
+    steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
