@@ -1,4 +1,4 @@
-name: Amazon Node Scraper - Account 4 (20 nodes)
+name: Amazon Node Scraper - Account 4 (26 nodes)
 
 on:
   workflow_dispatch:
@@ -38,6 +38,12 @@ jobs:
           - { node_id: "21833213031",  node_name: "Cat3213031" }
           - { node_id: "21845202031",  node_name: "Cat5202031" }
           - { node_id: "21833429031",  node_name: "Cat3429031" }
+          - { node_id: "21845202031",   node_name: "Cat5202031" }
+          - { node_id: "21845418031",   node_name: "Cat5418031" }
+          - { node_id: "21868934031",   node_name: "Cat8934031" }
+          - { node_id: "21832886031",   node_name: "Cat2886031" }
+          - { node_id: "21832883031",   node_name: "Mobile Phones" }
+          - { node_id: "21857955031",   node_name: "Cat7955031" }
 
     steps:
       - uses: actions/checkout@v4
