@@ -1,4 +1,4 @@
-name: Amazon Scraper - Account 4 (Groups 33-42)
+name: Amazon Scraper - Account 4 (Groups 0-12)
 
 on:
   schedule:
@@ -22,7 +22,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        group_index: [33,34,35,36,37,38,39,40,41,42]
+        group_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
       fail-fast: false
       max-parallel: 20
 
