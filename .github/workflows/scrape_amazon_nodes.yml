@@ -1,4 +1,4 @@
-name: Amazon Node Scraper - Account 4 (13 nodes)
+name: Amazon Node Scraper - Account 4 (20 nodes)
 
 on:
   workflow_dispatch:
@@ -13,25 +13,31 @@ jobs:
     name: "Node ${{ matrix.node_id }} (${{ matrix.node_name }})"
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    continue-on-error: true
     strategy:
       fail-fast: false
       max-parallel: 20
       matrix:
         include:
-          - { node_id: "21832982031",  node_name: "Cat2982031" }
-          - { node_id: "26082322031",  node_name: "Cat2322031" }
-          - { node_id: "27972173031",  node_name: "Cat2173031" }
-          - { node_id: "18022560031",  node_name: "Video Games" }
-          - { node_id: "21833429031",  node_name: "Cat3429031" }
-          - { node_id: "49987991031",  node_name: "Cat7991031" }
-          - { node_id: "21832870031",  node_name: "Cat2870031" }
-          - { node_id: "26082332031",  node_name: "Cat2332031" }
+          - { node_id: "18021990031",  node_name: "Tools & Home Improvement" }
+          - { node_id: "21805227031",  node_name: "Cat5227031" }
+          - { node_id: "18018045031",  node_name: "Cat8045031" }
           - { node_id: "21845410031",  node_name: "Cat5410031" }
-          - { node_id: "18022503031",  node_name: "Toys & Games" }
-          - { node_id: "21857879031",  node_name: "Cat7879031" }
-          - { node_id: "21857974031",  node_name: "Cat7974031" }
-          - { node_id: "21857914031",  node_name: "Cat7914031" }
+          - { node_id: "21845335031",  node_name: "Cat5335031" }
+          - { node_id: "21826026031",  node_name: "Perfumes" }
+          - { node_id: "21845419031",  node_name: "Cat5419031" }
+          - { node_id: "21868934031",  node_name: "Cat8934031" }
+          - { node_id: "21832870031",  node_name: "Cat2870031" }
+          - { node_id: "21845331031",  node_name: "Cat5331031" }
+          - { node_id: "27360698031",  node_name: "Cat0698031" }
+          - { node_id: "21858001031",  node_name: "Cat8001031" }
+          - { node_id: "21820640031",  node_name: "Cat0640031" }
+          - { node_id: "21857922031",  node_name: "Cat7922031" }
+          - { node_id: "212533997031",  node_name: "Cat3997031" }
+          - { node_id: "21833210031",  node_name: "Cat3210031" }
+          - { node_id: "49987963031",  node_name: "Cat7963031" }
+          - { node_id: "21833213031",  node_name: "Cat3213031" }
+          - { node_id: "21845202031",  node_name: "Cat5202031" }
+          - { node_id: "21833429031",  node_name: "Cat3429031" }
 
     steps:
       - uses: actions/checkout@v4
@@ -134,7 +140,7 @@ jobs:
           git config user.name "Scraper Bot"
           git add data/
           if ! git diff --staged --quiet; then
-            git commit -m "Node scraper from account4 - $(date -u +%Y-%m-%d)"
+            git commit -m "Node scraper test from account4 - $(date -u +%Y-%m-%d)"
             for i in 1 2 3; do
               git pull --rebase origin main && git push && break || sleep $((RANDOM % 20 + 10))
             done

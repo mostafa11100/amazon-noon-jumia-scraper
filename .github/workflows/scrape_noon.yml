@@ -1,10 +1,14 @@
-name: Noon Scraper - Account 4 (Groups 17-24)
+name: Noon Scraper - Account 4 (Groups 33-42)
 
 on:
   schedule:
-    - cron: '6 2 * * *'
+    - cron: '0 2 * * *'   # 4:00 AM Egypt time
   workflow_dispatch:
     inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual run'
       limit:
         description: 'Max products per group'
         required: false
@@ -12,13 +16,13 @@ on:
 
 jobs:
   scrape:
-    name: "Scrape Group ${{ matrix.group_index }}"
+    name: Scrape Group ${{ matrix.group_index }}
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
     continue-on-error: true
     strategy:
       matrix:
-        group_index: [17, 18, 19, 20, 21, 22, 23, 24]
+        group_index: [33,34,35,36,37,38,39,40,41,42]
       fail-fast: false
       max-parallel: 20
 
@@ -30,18 +34,14 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install playwright playwright-stealth
 
-      - name: Cache Playwright browser
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-v1
-
-      - name: Install Playwright browser
+      - name: Install Playwright browsers
         run: playwright install chromium --with-deps
-        timeout-minutes: 10
+
+      - name: Stagger start
+        run: sleep $((RANDOM % 20 + 5))
 
       - name: Start virtual display
         run: |
@@ -49,21 +49,24 @@ jobs:
           Xvfb :99 -screen 0 1920x1080x24 &
           echo "DISPLAY=:99" >> $GITHUB_ENV
 
-      - name: Stagger start
-        run: sleep $((RANDOM % 20 + 5))
-
-      - name: "Scrape Group ${{ matrix.group_index }}"
+      - name: Run spider (Group ${{ matrix.group_index }})
+        id: scrape
         env:
-          DISPLAY: ":99"
+          DISPLAY: :99
         run: python noon_spider.py --group_index ${{ matrix.group_index }} --limit ${{ github.event.inputs.limit || '99999' }}
-        timeout-minutes: 160
+
+      - name: Log blocked group
+        if: failure()
+        run: echo "Group ${{ matrix.group_index }} | blocked/failed" >> blocked.log
 
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: "noon-products-${{ matrix.group_index }}"
-          path: "products_${{ matrix.group_index }}.json"
+          name: noon-products-${{ matrix.group_index }}
+          path: |
+            products_${{ matrix.group_index }}.json
+            blocked.log
 
   export:
     name: Merge & Export CSV
@@ -84,37 +87,36 @@ jobs:
       - name: Merge JSON -> CSV
         run: |
           python - <<'EOF'
-          import json, glob, csv, sys
-          sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+          import json, glob, csv
 
           merged = []
           for fname in sorted(glob.glob("products_*.json")):
-              try:
-                  data = json.load(open(fname, encoding="utf-8"))
-                  merged.extend(data)
-                  print(f"{fname}: {len(data)} products")
-              except Exception as e:
-                  print(f"{fname}: ERROR - {e}")
+              with open(fname, encoding="utf-8") as f:
+                  try:
+                      data = json.load(f)
+                      merged.extend(data)
+                      print(f"{fname}: {len(data)} products")
+                  except Exception as e:
+                      print(f"{fname}: ERROR - {e}")
 
-          seen = set()
-          unique = []
-          for p in merged:
-              pid = p.get("product_id", "")
-              if pid and pid not in seen:
-                  seen.add(pid)
-                  unique.append(p)
-              elif not pid:
-                  unique.append(p)
+          print(f"\nTotal: {len(merged)} products")
 
-          print(f"\nTotal: {len(merged)}, Unique: {len(unique)}")
+          columns = [
+              "platform", "sku", "title", "brand", "category",
+              "current_price", "original_price", "discount",
+              "rating", "reviews_count", "availability",
+              "seller", "noon_express",
+              "main_image", "all_images", "product_url", "scraped_at",
+          ]
 
-          if unique:
-              columns = list(unique[0].keys())
-              with open("noon_products.csv", "w", encoding="utf-8-sig", newline="") as f:
-                  writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
-                  writer.writeheader()
-                  writer.writerows(unique)
-              print("Saved: noon_products.csv")
+          with open("noon_products.csv", "w", encoding="utf-8-sig", newline="") as f:
+              writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
+              writer.writeheader()
+              for item in merged:
+                  item["all_images"] = " | ".join(item.get("all_images", []))
+                  writer.writerow(item)
+
+          print("CSV saved: noon_products.csv")
           EOF
 
       - name: Push to master repo
@@ -122,14 +124,14 @@ jobs:
           MASTER_TOKEN: ${{ secrets.MASTER_REPO_TOKEN }}
         run: |
           git clone https://${MASTER_TOKEN}@github.com/khaledali45947-dev/scraped-products-master.git master_repo
-          mkdir -p master_repo/data/account4
-          cp noon_products.csv master_repo/data/account4/ 2>/dev/null || true
+          mkdir -p master_repo/data/account1
+          cp noon_products.csv master_repo/data/account1/ 2>/dev/null || true
           cd master_repo
           git config user.email "scraper-bot@github.com"
           git config user.name "Scraper Bot"
           git add data/
           if ! git diff --staged --quiet; then
-            git commit -m "Update noon from account4 - $(date -u +%Y-%m-%d)"
+            git commit -m "Update noon from account1 - $(date -u +%Y-%m-%d)"
             for i in 1 2 3; do
               git pull --rebase origin main && git push && break || sleep $((RANDOM % 20 + 10))
             done
