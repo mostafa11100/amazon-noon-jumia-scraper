@@ -19,45 +19,41 @@ jobs:
       max-parallel: 20
       matrix:
         include:
-          - { node_id: "21832886031",  node_name: "node_21832886031" }
-          - { node_id: "18017874031",  node_name: "Agricultural Vehicle Parts & Equipment" }
-          - { node_id: "21805227031",  node_name: "node_21805227031" }
-          - { node_id: "21845181031",  node_name: "node_21845181031" }
-          - { node_id: "21826029031",  node_name: "node_21826029031" }
-          - { node_id: "18020637031",  node_name: "node_18020637031" }
-          - { node_id: "21832878031",  node_name: "node_21832878031" }
-          - { node_id: "21826026031",  node_name: "Perfumes" }
-          - { node_id: "21845419031",  node_name: "node_21845419031" }
-          - { node_id: "21868934031",  node_name: "node_21868934031" }
-          - { node_id: "96581804031",  node_name: "node_96581804031" }
-          - { node_id: "21833200031",  node_name: "node_21833200031" }
-          - { node_id: "212401097031",  node_name: "node_212401097031" }
-          - { node_id: "26082316031",  node_name: "node_26082316031" }
-          - { node_id: "21857904031",  node_name: "node_21857904031" }
-          - { node_id: "21857914031",  node_name: "node_21857914031" }
-          - { node_id: "21857944031",  node_name: "node_21857944031" }
-          - { node_id: "21832907031",  node_name: "node_21832907031" }
-          - { node_id: "21857878031",  node_name: "node_21857878031" }
-          - { node_id: "21857974031",  node_name: "node_21857974031" }
-          - { node_id: "21832982031",  node_name: "node_21832982031" }
-          - { node_id: "21833220031",  node_name: "node_21833220031" }
-          - { node_id: "21833429031",  node_name: "node_21833429031" }
-          - { node_id: "86421114031",  node_name: "Sell" }
+          - { node_id: "21832886031", node_name: "node_21832886031" }
+          - { node_id: "18017874031", node_name: "Agricultural Vehicle Parts & Equipment" }
+          - { node_id: "21805227031", node_name: "node_21805227031" }
+          - { node_id: "21845181031", node_name: "node_21845181031" }
+          - { node_id: "21826029031", node_name: "node_21826029031" }
+          - { node_id: "18020637031", node_name: "node_18020637031" }
+          - { node_id: "21832878031", node_name: "node_21832878031" }
+          - { node_id: "21826026031", node_name: "Perfumes" }
+          - { node_id: "21845419031", node_name: "node_21845419031" }
+          - { node_id: "21868934031", node_name: "node_21868934031" }
+          - { node_id: "96581804031", node_name: "node_96581804031" }
+          - { node_id: "21833200031", node_name: "node_21833200031" }
+          - { node_id: "212401097031", node_name: "node_212401097031" }
+          - { node_id: "26082316031", node_name: "node_26082316031" }
+          - { node_id: "21857904031", node_name: "node_21857904031" }
+          - { node_id: "21857914031", node_name: "node_21857914031" }
+          - { node_id: "21857944031", node_name: "node_21857944031" }
+          - { node_id: "21832907031", node_name: "node_21832907031" }
+          - { node_id: "21857878031", node_name: "node_21857878031" }
+          - { node_id: "21857974031", node_name: "node_21857974031" }
+          - { node_id: "21832982031", node_name: "node_21832982031" }
+          - { node_id: "21833220031", node_name: "node_21833220031" }
+          - { node_id: "21833429031", node_name: "node_21833429031" }
+          - { node_id: "86421114031", node_name: "Sell" }
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
-
       - name: Install dependencies
         run: pip install curl-cffi scrapy
-
       - name: Stagger start
         run: sleep $((RANDOM % 20 + 5))
-
       - name: Scrape node ${{ matrix.node_id }}
         run: |
           python amazon_node_spider.py \
@@ -65,13 +61,12 @@ jobs:
             --node_name "${{ matrix.node_name }}" \
             --limit     ${{ github.event.inputs.limit || '99999' }}
         timeout-minutes: 90
-
       - name: Upload artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: node-${{ matrix.node_id }}
-          path: "node_*_products.csv"
+          path: "node_*.json"
           if-no-files-found: warn
 
   export:
@@ -85,40 +80,46 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts/
-
-      - name: Merge CSVs
+          pattern: node-*
+          merge-multiple: true
+      - name: Merge JSON to CSV
         run: |
-          python -c "
-          import csv, pathlib, sys
-          sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-          rows, seen, header = [], set(), None
-          for f in sorted(pathlib.Path('artifacts').rglob('*.csv')):
-              with open(f, encoding='utf-8-sig') as fh:
-                  reader = csv.DictReader(fh)
-                  if header is None: header = reader.fieldnames
-                  for r in reader:
-                      asin = r.get('product_id', '')
-                      if asin and asin not in seen:
-                          seen.add(asin)
-                          rows.append(r)
-          print(f'Merged {len(rows)} unique products')
-          with open('amazon_products_nodes.csv', 'w', encoding='utf-8-sig', newline='') as fh:
-              writer = csv.DictWriter(fh, fieldnames=header or [], extrasaction='ignore')
-              writer.writeheader()
-              writer.writerows(rows)
-          "
-
+          cat > _merge.py << 'PYEOF'
+import json, glob, csv, sys
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+merged = []
+for fname in sorted(glob.glob("node_*.json")):
+    try:
+        data = json.loads(open(fname, encoding="utf-8").read())
+        merged.extend(data)
+        print(f"{fname}: {len(data)} products")
+    except: pass
+seen = set()
+unique = []
+for p in merged:
+    asin = p.get("asin","")
+    if asin and asin not in seen:
+        seen.add(asin)
+        unique.append(p)
+print(f"Total raw: {len(merged)}, Unique: {len(unique)}")
+columns = ["platform","asin","title","brand","category","current_price","original_price",
+           "discount","rating","reviews_count","prime_eligible","amazon_choice",
+           "sponsored","main_image","product_url","scraped_at"]
+with open("amazon_products_nodes.csv", "w", encoding="utf-8-sig", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
+    writer.writeheader()
+    writer.writerows(unique)
+print(f"Saved: amazon_products_nodes.csv ({len(unique)} products)")
+          PYEOF
+          python _merge.py
       - name: Upload merged CSV
         uses: actions/upload-artifact@v4
         with:
-          name: amazon-nodes-merged
+          name: amazon-products-nodes
           path: amazon_products_nodes.csv
-
       - name: Push to master repo
         if: always()
         env:
@@ -136,6 +137,5 @@ jobs:
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "Update amazon nodes from account4 - $(date +%Y-%m-%d)"
           for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push && echo "Pushed OK" && exit 0
-            sleep $((RANDOM % 10 + 5))
+            git pull --rebase origin main && git push && echo "Pushed OK" && break || sleep $((RANDOM % 10 + 5))
           done
